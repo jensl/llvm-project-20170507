@@ -1316,8 +1316,23 @@ void CXXNameMangler::mangleUnqualifiedName(const NamedDecl *ND,
 
     if (const NamespaceDecl *NS = dyn_cast<NamespaceDecl>(ND)) {
       if (NS->isAnonymousNamespace()) {
+#if 0
         // This is how gcc mangles these names.
         Out << "12_GLOBAL__N_1";
+#endif
+
+#if 1
+        // Add a per-file unique key for the source file containing
+        // the declaration.
+        // FIXME: This should be controlled by a flag.
+        SourceManager &SM = Context.getASTContext().getSourceManager();
+        SourceLocation Loc = SM.getSpellingLoc(NS->getLocStart());
+
+        std::string Name("__anonymous_");
+        Name.append(std::to_string(SM.getFileID(Loc).getHashValue()));
+
+        Out << Name.size() << Name;
+#endif
         break;
       }
     }

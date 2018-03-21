@@ -527,6 +527,10 @@ class NamespaceDecl : public NamedDecl, public DeclContext,
   /// boolean value indicating whether this is an inline namespace.
   llvm::PointerIntPair<NamespaceDecl *, 1, bool> AnonOrFirstNamespaceAndInline;
 
+  /// Names in this specific namespace declaration should not be included in
+  /// lookups.
+  bool IsDisabled = false;
+
   NamespaceDecl(ASTContext &C, DeclContext *DC, bool Inline,
                 SourceLocation StartLoc, SourceLocation IdLoc,
                 IdentifierInfo *Id, NamespaceDecl *PrevDecl);
@@ -628,6 +632,9 @@ public:
   static NamespaceDecl *castFromDeclContext(const DeclContext *DC) {
     return static_cast<NamespaceDecl *>(const_cast<DeclContext*>(DC));
   }
+
+  bool isDisabled() const { return IsDisabled; }
+  void setDisabled() { IsDisabled = true; }
 };
 
 /// Represent the declaration of a variable (in which case it is
